@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["teohuiming@gmail.com"]
   gem.description   = %q{Command line tool to collect and print public keys.}
   gem.summary       = %q{CLI tool to collect and print public keys.}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/teohm/pk"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

@@ -3,9 +3,14 @@
 require 'thor'
 
 module Helper
+
+  def init
+    `mkdir -p ~/.pk/data/`
+  end
+
   def all_members_of(team)
     [].tap do |list|
-      `ls ~/.pkeys/data/#{team}`.split.each do |filename|
+      `ls ~/.pk/data/#{team}`.split.each do |filename|
         list << filename unless ignore_file?(filename)
       end
     end
@@ -21,26 +26,29 @@ class Team < Thor
 
   desc "add NAME, GIT_URL", "add team repo via git clone"
   def add(name, git_url)
-    `git clone #{git_url} ~/.pkeys/data/#{name}`
+    init
+    `git clone #{git_url} ~/.pk/data/#{name}`
   end
 
   desc "reload [TEAM]", "reload a team repo, or all teams if not specified"
   def reload(team=nil)
-    teams = Dir["#{ENV["HOME"]}/.pkeys/data/*/"].map{|f| File.basename(f) }
+    init
+    teams = Dir["#{ENV["HOME"]}/.pk/data/*/"].map{|f| File.basename(f) }
     teams = teams.select{|t| t == team} if team
     teams.each do |t|
-      `cd ~/.pkeys/data/#{t} && git pull && cd -`
+      `cd ~/.pk/data/#{t} && git pull && cd -`
     end
   end
 
   desc "list [TEAM]", "list all team, or team members if team is specified"
   def list(team=nil)
+    init
     if team
       all_members_of(team).each do |m|
         puts m
       end
     else
-      `ls ~/.pkeys/data`.split.each do |t|
+      `ls ~/.pk/data`.split.each do |t|
         puts t
       end
     end
@@ -53,9 +61,10 @@ class Pk < Thor
 
   desc "keys TEAM [MEMBER1,MEMBER2,..]", "print public keys of members in a specific team"
   def keys(team, members=nil)
+    init
     member_list = members ? members.split(',').compact : all_members_of(team)
     member_list.each do |member|
-      puts `cat ~/.pkeys/data/#{team}/#{member}`
+      puts `cat ~/.pk/data/#{team}/#{member}`
     end
   end
 

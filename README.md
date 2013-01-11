@@ -1,5 +1,7 @@
 # pk
 
+[![Gem Version](https://badge.fury.io/rb/pk.png)](http://badge.fury.io/rb/pk)
+
 Command line tool to print public keys.
 
 ## Usage

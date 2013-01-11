@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+
+module Helper
+  def all_members_of(team)
+    [].tap do |list|
+      `ls ~/.pkeys/data/#{team}`.split.each do |filename|
+        list << filename unless ignore_file?(filename)
+      end
+    end
+  end
+
+  def ignore_file?(filename)
+    filename.include?('.') ? true : false
+  end
+end
+
+class Team < Thor
+  include Helper
+
+  desc "add NAME, GIT_URL", "add team repo via git clone"
+  def add(name, git_url)
+    `git clone #{git_url} ~/.pkeys/data/#{name}`
+  end
+
+  desc "reload [TEAM]", "reload a team repo, or all teams if not specified"
+  def reload(team=nil)
+    teams = Dir["#{ENV["HOME"]}/.pkeys/data/*/"].map{|f| File.basename(f) }
+    teams = teams.select{|t| t == team} if team
+    teams.each do |t|
+      `cd ~/.pkeys/data/#{t} && git pull && cd -`
+    end
+  end
+
+  desc "list [TEAM]", "list all team, or team members if team is specified"
+  def list(team=nil)
+    if team
+      all_members_of(team).each do |m|
+        puts m
+      end
+    else
+      `ls ~/.pkeys/data`.split.each do |t|
+        puts t
+      end
+    end
+  end
+
+end
+
+class Pk < Thor
+  include Helper
+
+  desc "keys TEAM [MEMBER1,MEMBER2,..]", "print public keys of members in a specific team"
+  def keys(team, members=nil)
+    member_list = members ? members.split(',').compact : all_members_of(team)
+    member_list.each do |member|
+      puts `cat ~/.pkeys/data/#{team}/#{member}`
+    end
+  end
+
+  desc "team", "manage teams"
+  subcommand "team", Team
+end
+
+Pk.start

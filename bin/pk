@@ -2,6 +2,32 @@
 
 require 'thor'
 
+class PkIgnoreFile
+  PKIGNORE_NAMES = %w(pkignore .pkignore).freeze
+
+  def initialize(path)
+    @ignore_list = PKIGNORE_NAMES.dup
+    PKIGNORE_NAMES.each do |filename|
+      file = File.expand_path(File.join(path, filename))
+      if File.exist? file
+        @ignore_list = @ignore_list + File.open(file, 'r').read.split("\n")
+        break
+      end
+    end
+  end
+
+  def ignore_file?(filename)
+    ignore = false
+    @ignore_list.each do |ignore_pattern|
+      if File.fnmatch(ignore_pattern, filename, File::FNM_PATHNAME)
+        ignore = true
+        break
+      end
+    end
+    ignore
+  end
+end
+
 module Helper
 
   def init
@@ -9,15 +35,12 @@ module Helper
   end
 
   def all_members_of(team)
+    pkignore = PkIgnoreFile.new("~/.pk/data/#{team}")
     [].tap do |list|
       `ls ~/.pk/data/#{team}`.split.each do |filename|
-        list << filename unless ignore_file?(filename)
+        list << filename unless pkignore.ignore_file?(filename)
       end
     end
-  end
-
-  def ignore_file?(filename)
-    filename.include?('.') ? true : false
   end
 end
 

@@ -2,4 +2,4 @@
 
 require 'pk/main'
 
-Pk::Main.start
+Pk::Keys.start

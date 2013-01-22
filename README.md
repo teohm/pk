@@ -24,6 +24,9 @@ pk team list team1
 # print public keys
 pk keys team1 member1,member2
 pk keys team1
+
+pkeys team1 member1,member2
+pkeys team1
 ```
 
 ## Rough cut version

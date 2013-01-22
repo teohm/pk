@@ -11,7 +11,7 @@ Command line tool to print public keys.
 gem install pk
 
 # add team repo
-pk team add team1 https://gist.github.com/4509339
+pk team add team1 https://gist.github.com/4509339.git
 
 # update repo
 pk team reload
